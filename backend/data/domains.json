@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "domain": "unikin.ac.cd",
+    "lastScan": "Aujourd'hui, 08:30",
+    "attempts": 0,
+    "status": "Protégé"
+  },
+  {
+    "id": 2,
+    "domain": "paypal.com",
+    "lastScan": "Hier, 22:15",
+    "attempts": 42,
+    "status": "Alerte Élevée"
+  }
+]

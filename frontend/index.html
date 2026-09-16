@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection - Security Dashboard</title>
+    <!-- Fonts Google & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar de Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-shield-halved brand-icon"></i>
+                <span class="brand-title">Phishing Detection</span>
+            </div>
+
+            <div class="nav-section">
+                <span class="section-label">Navigation</span>
+                <ul class="nav-list">
+                    <li class="nav-item active" data-tab="tab-dashboard">
+                        <a href="#"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item" data-tab="tab-domains">
+                        <a href="#"><i class="fa-solid fa-globe"></i> Monitored Domains</a>
+                    </li>
+                    <li class="nav-item" data-tab="tab-threats">
+                        <a href="#"><i class="fa-solid fa-triangle-exclamation"></i> Threats Analysis</a>
+                    </li>
+                    <li class="nav-item" data-tab="tab-settings">
+                        <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section system-section">
+                <span class="section-label">System</span>
+                <ul class="nav-list">
+                    <li class="nav-item" data-tab="tab-admin">
+                        <a href="#"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Zone de Contenu Principal -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="page-title">Phishing Threat Analyzer</h1>
+                    <p id="page-subtitle">Analyse IA en temps réel des URLs et messages d'ingénierie sociale.</p>
+                </div>
+                <button class="btn-primary" id="btn-quick-scan">
+                    <i class="fa-solid fa-bolt"></i> Quick Scan
+                </button>
+            </header>
+
+            <section class="tab-view active-view" id="tab-dashboard">
+                <div class="dashboard-grid">
+                    <!-- Formulaire d'Analyse -->
+                    <div class="card scan-card">
+                        <div class="card-header">
+                            <h2>Saisie de la Menace</h2>
+                            <div class="type-selector">
+                                <button class="type-btn active" data-type="url"><i class="fa-solid fa-link"></i> URL</button>
+                                <button class="type-btn" data-type="message"><i class="fa-solid fa-envelope"></i> Message</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="analyze-form">
+                                <div class="input-group">
+                                    <input type="text" id="target-input" placeholder="https://exemple-suspect.xyz/login" required>
+                                </div>
+                                <button type="submit" class="btn-submit" id="submit-btn">
+                                    <span>Lancer l'analyse</span> <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </form>
+                            
+                            <!-- Section Simulation Pédagogique -->
+                            <div class="simulation-section">
+                                <span class="simulation-label">Exemples de démonstration :</span>
+                                <div class="demo-buttons">
+                                    <button type="button" class="btn-demo" onclick="loadDemo('phishing_url')">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> URL Phishing (PayPal)
+                                    </button>
+                                    <button type="button" class="btn-demo" onclick="loadDemo('legit_url')">
+                                        <i class="fa-solid fa-check-circle"></i> URL Légitime (Google)
+                                    </button>
+                                    <button type="button" class="btn-demo" onclick="loadDemo('phishing_msg')">
+                                        <i class="fa-solid fa-envelope"></i> SMS Urgent Banque
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carte de Résultat & Score -->
+                    <div class="card result-card" id="result-card">
+                        <div class="card-header">
+                            <h2>Analyse Threat Score</h2>
+                            <span class="status-badge status-idle" id="status-badge">En attente</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="metrics-row">
+                                <div class="metric-box">
+                                    <span class="metric-value" id="score-display">--%</span>
+                                    <span class="metric-label">Score de Risque</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-value" id="risk-level-display">--</span>
+                                    <span class="metric-label">Niveau de Menace</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-value" id="classification-display">--</span>
+                                    <span class="metric-label">Verdict IA</span>
+                                </div>
+                            </div>
+
+                            <div class="recommended-action-wrapper" id="recommended-action-wrapper" style="display: none;">
+                                <h3>Action Recommandée</h3>
+                                <p class="recommended-action" id="recommended-action"></p>
+                            </div>
+
+                            <div class="explanations-wrapper">
+                                <h3>Facteurs de Risque Identifiés (XAI)</h3>
+                                <ul class="explanations-list" id="explanations-list">
+                                    <li class="placeholder-text">Soumettez une URL ou un message pour générer les explications du modèle.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-view" id="tab-domains"></section>
+            <section class="tab-view" id="tab-threats"></section>
+            <section class="tab-view" id="tab-settings"></section>
+            <section class="tab-view" id="tab-admin"></section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
