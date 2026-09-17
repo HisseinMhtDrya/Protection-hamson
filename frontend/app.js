@@ -268,17 +268,66 @@ function loadAdminClusterStatus() {
         <div class="card">
             <div class="card-header">
                 <h2>Supervision des Microservices</h2>
-                <span class="status-badge status-legit">All Systems Operational</span>
+                <span class="status-badge status-idle" id="cluster-status">Vérification...</span>
             </div>
             <div class="card-body">
                 <div class="metrics-row">
-                    <div class="metric-box"><span class="metric-value" style="color: var(--accent-green);">ONLINE</span><span class="metric-label">Nginx Proxy</span></div>
-                    <div class="metric-box"><span class="metric-value" style="color: var(--accent-green);">ONLINE</span><span class="metric-label">Express Backend</span></div>
-                    <div class="metric-box"><span class="metric-value" style="color: var(--accent-green);">ONLINE</span><span class="metric-label">FastAPI AI Engine</span></div>
+                    <div class="metric-box"><span class="metric-value" id="nginx-status">...</span><span class="metric-label">Nginx Proxy</span></div>
+                    <div class="metric-box"><span class="metric-value" id="backend-status">...</span><span class="metric-label">Express Backend</span></div>
+                    <div class="metric-box"><span class="metric-value" id="ai-status">...</span><span class="metric-label">FastAPI AI Engine</span></div>
                 </div>
+                <p id="health-last-check" style="margin-top: 16px; color: var(--text-secondary);">Vérification en cours...</p>
             </div>
         </div>
     `;
+
+    refreshAdminClusterStatus();
+    if (window.adminHealthTimer) clearInterval(window.adminHealthTimer);
+    window.adminHealthTimer = setInterval(refreshAdminClusterStatus, 10000);
+}
+
+async function refreshAdminClusterStatus() {
+    const clusterStatus = document.getElementById('cluster-status');
+    const nginxStatus = document.getElementById('nginx-status');
+    const backendStatus = document.getElementById('backend-status');
+    const aiStatus = document.getElementById('ai-status');
+    const lastCheck = document.getElementById('health-last-check');
+    if (!clusterStatus || !nginxStatus || !backendStatus || !aiStatus || !lastCheck) return;
+
+    const setStatus = (element, online) => {
+        element.textContent = online ? 'ONLINE' : 'OFFLINE';
+        element.style.color = online ? 'var(--accent-green)' : 'var(--accent-red)';
+    };
+
+    try {
+        const [nginxResponse, backendResponse] = await Promise.all([
+            fetch('/health', { cache: 'no-store' }),
+            fetch(`${API_URL}/health`, { cache: 'no-store' })
+        ]);
+        const nginxHealth = nginxResponse.ok && (nginxResponse.headers.get('content-type') || '').includes('application/json')
+            ? await nginxResponse.json()
+            : null;
+        const health = backendResponse.ok ? await backendResponse.json() : null;
+        const backendOnline = health?.services?.backend?.status === 'online';
+        const aiOnline = health?.services?.ai?.status === 'online';
+        const nginxOnline = nginxResponse.ok && nginxHealth?.status !== undefined;
+
+        setStatus(nginxStatus, nginxOnline);
+        setStatus(backendStatus, backendOnline);
+        setStatus(aiStatus, aiOnline);
+
+        const allOnline = nginxOnline && backendOnline && aiOnline;
+        clusterStatus.textContent = allOnline ? 'All Systems Operational' : 'Service dégradé';
+        clusterStatus.className = `status-badge ${allOnline ? 'status-legit' : 'status-phishing'}`;
+        lastCheck.textContent = `Dernière vérification : ${new Date().toLocaleTimeString()}`;
+    } catch (error) {
+        setStatus(nginxStatus, false);
+        setStatus(backendStatus, false);
+        setStatus(aiStatus, false);
+        clusterStatus.textContent = 'Services indisponibles';
+        clusterStatus.className = 'status-badge status-phishing';
+        lastCheck.textContent = 'Dernière vérification : échec de connexion';
+    }
 }
 
 function showLoading() {

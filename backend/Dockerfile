@@ -5,6 +5,7 @@ WORKDIR /app
 # Install dependencies
 COPY package*.json ./
 RUN npm install --production
+RUN rm -rf node_modules/.cache
 
 # Copy source
 COPY . .

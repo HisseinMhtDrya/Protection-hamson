@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const axios = require('axios');
 
 // Import routes
 const urlRoutes = require('./routes/urlRoutes');
@@ -161,8 +162,30 @@ app.post('/api/domains', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    let aiService = { status: 'offline' };
+
+    try {
+        const response = await axios.get(`${aiServiceUrl}/health`, { timeout: 2000 });
+        aiService = {
+            status: response.data?.status === 'healthy' ? 'online' : 'degraded',
+            url_model_loaded: response.data?.url_model_loaded ?? false,
+            message_model_loaded: response.data?.message_model_loaded ?? false
+        };
+    } catch (error) {
+        aiService.error = 'Service IA inaccessible';
+    }
+
+    const allHealthy = aiService.status === 'online';
+    res.json({
+        status: allHealthy ? 'healthy' : 'degraded',
+        timestamp: new Date().toISOString(),
+        services: {
+            backend: { status: 'online' },
+            ai: aiService
+        }
+    });
 });
 
 // Serve frontend for all other routes
