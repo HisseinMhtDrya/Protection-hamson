@@ -1,275 +1,301 @@
-# 🛡️ Phishing Detector - Protection Hamson
+# 🛡️ PROTECTION HAMSON
 
-Système de détection de phishing basé sur l'IA utilisant une architecture microservices avec analyse d'URLs et de messages.
+## Détecteur Web d’Hameçonnage Assisté par Intelligence Artificielle
 
-## 🏗️ Architecture
+<p align="center">
+  <strong>Projet universitaire — Réseaux Informatiques & Cybersécurité</strong><br>
+  Université de Kinshasa (UNIKIN) — Master 1
+</p>
 
+---
+
+## 👨‍🎓 Présentation du travail
+
+**Protection Hamson** est un système web intelligent conçu pour détecter les tentatives d’**hameçonnage (phishing)** à partir d'URLs et de messages.
+
+L'application combine une **interface web**, une **API sécurisée** et un **service d'intelligence artificielle** afin d'analyser les contenus soumis par l'utilisateur et de retourner un résultat accompagné d'un **score de risque et d'une explication**.
+
+### 🎯 Objectif
+
+L'objectif principal est de fournir un outil simple permettant à l'utilisateur de :
+
+* analyser une URL ;
+* analyser un message ;
+* identifier un contenu potentiellement malveillant ;
+* comprendre la raison du résultat obtenu.
+
+---
+
+# 👥 Équipe du projet
+
+| N° | Étudiant                 | Responsabilité                            |
+| -- | ------------------------ | ----------------------------------------- |
+| 01 | **Hissein Mahamat Drya** | Backend, sécurité & intégration           |
+| 02 | **Étudiant 2**           | Détection des URLs & Machine Learning     |
+| 03 | **Étudiant 3**           | Détection des messages & Machine Learning |
+| 04 | **Étudiant 4**           | Frontend & déploiement                    |
+
+> **Superviseur :** [Nom du superviseur]
+> **Faculté :** Faculté des Sciences Informatiques
+> **Spécialité :** Réseaux & Cybersécurité
+> **Niveau :** Master 1
+
+---
+
+# 🖥️ Aperçu de l'application
+
+### Page d'accueil
+
+<p align="center">
+  <img src="docs/images/home.png" width="850">
+</p>
+
+### Analyse d'une URL
+
+<p align="center">
+  <img src="docs/images/url-analysis.png" width="850">
+</p>
+
+### Analyse d'un message
+
+<p align="center">
+  <img src="docs/images/message-analysis.png" width="850">
+</p>
+
+### Résultat de l'analyse
+
+<p align="center">
+  <img src="docs/images/result.png" width="850">
+</p>
+
+> Les captures d'écran présentent les principales fonctionnalités de **Protection Hamson**.
+
+---
+
+# 🏗️ Architecture du système
+
+```text
+                         👤 UTILISATEUR
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │   FRONTEND WEB   │
+                    │   HTML / CSS / JS│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │  BACKEND API     │
+                    │ Node.js / Express│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │    SERVICE IA    │
+                    │ Python / FastAPI │
+                    └────────┬─────────┘
+                             │
+                    ┌────────┴─────────┐
+                    ▼                  ▼
+             ┌─────────────┐    ┌──────────────┐
+             │ Modèle URL  │    │ Modèle Texte │
+             │Random Forest│    │ TF-IDF + LR  │
+             └──────┬──────┘    └──────┬───────┘
+                    │                  │
+                    └────────┬─────────┘
+                             ▼
+                    📊 SCORE + EXPLICATION
 ```
-                    UTILISATEUR
-                         │
-                       HTTPS
-                         │
-                         ▼
-                  FRONTEND WEB
-              HTML / Bootstrap / JS
-                         │
-                         ▼
-                 BACKEND EXPRESS
-              🛡️ Helmet
-              🚦 Rate Limiting
-              ✅ Validation Zod
-              📋 Logs
-                         │
-                         ▼
-                  SERVICE IA
-              Python + FastAPI
-                         │
-                         ▼
-                MODÈLE MACHINE LEARNING
-                   Random Forest
-                   TF-IDF + Logistic Regression
-                         │
-                         ▼
-              SCORE + EXPLICATION
-```
 
-## 📁 Structure du projet
+---
 
-```
-phishing-detector/
+# ⚙️ Fonctionnalités principales
+
+### 🔗 Détection des URLs
+
+L'utilisateur peut soumettre une URL afin d'obtenir une analyse permettant d'identifier les caractéristiques associées au phishing.
+
+### 💬 Détection des messages
+
+Le système analyse le contenu textuel d'un message afin d'identifier les caractéristiques pouvant indiquer une tentative d'hameçonnage.
+
+### 📊 Résultat
+
+Après l'analyse, l'application présente notamment :
+
+* le résultat de la classification ;
+* le niveau de risque ;
+* un score ;
+* une explication du résultat.
+
+### 🛡️ Sécurité
+
+L'API intègre plusieurs mécanismes de protection :
+
+* validation des entrées ;
+* sécurisation des en-têtes HTTP ;
+* limitation des requêtes ;
+* limitation de la taille des données reçues ;
+* journalisation des activités.
+
+---
+
+# 🧠 Modèles utilisés
+
+| Élément analysé | Technologie                  |
+| --------------- | ---------------------------- |
+| URLs            | Random Forest                |
+| Messages        | TF-IDF + Logistic Regression |
+| API IA          | Python / FastAPI             |
+| API principale  | Node.js / Express            |
+
+---
+
+# 🛠️ Technologies
+
+**Frontend**
+
+`HTML` · `CSS` · `JavaScript`
+
+**Backend**
+
+`Node.js` · `Express.js` · `Zod` · `Helmet`
+
+**Intelligence artificielle**
+
+`Python` · `FastAPI` · `Scikit-learn`
+
+**Infrastructure**
+
+`Docker` · `Nginx` · `HTTPS/TLS`
+
+---
+
+# 📁 Organisation du projet
+
+```text
+Protection-hamson/
 │
-├── frontend/              # Interface utilisateur
-│   ├── index.html
-│   ├── style.css
-│   └── app.js
+├── frontend/          → Interface utilisateur
+├── backend/           → API et sécurité
+├── ai-service/        → Service d'intelligence artificielle
+├── training/          → Entraînement des modèles
+├── datasets/          → Jeux de données
+├── models/            → Modèles entraînés
+├── reports/           → Résultats et évaluations
+├── docs/              → Documentation et captures
+├── nginx/             → Configuration serveur
 │
-├── backend/              # API Node.js/Express
-│   ├── server.js
-│   ├── package.json
-│   ├── routes/
-│   │   ├── urlRoutes.js
-│   │   └── messageRoutes.js
-│   └── middleware/
-│       ├── validation.js
-│       ├── security.js
-│       └── rateLimiter.js
-│
-├── ai-service/           # Service IA Python/FastAPI
-│   ├── main.py
-│   └── requirements.txt
-│
-├── training/             # Scripts d'entraînement et évaluation
-│   ├── train_url_model.py
-│   ├── train_message_model.py
-│   └── evaluate_models.py
-│
-├── datasets/             # Données d'entraînement
-│   ├── .gitkeep
-│   └── README.md        # Guide d'acquisition des datasets
-│
-├── models/               # Modèles entraînés
-│   └── .gitkeep
-│
-├── reports/              # Rapports d'évaluation
-│   ├── cm_url.png
-│   ├── roc_url.png
-│   ├── cm_message.png
-│   └── roc_message.png
-│
-├── nginx/                # Configuration Nginx
-│   ├── nginx.conf
-│   └── ssl/             # Certificats SSL
-│       └── .gitkeep
-│
+├── docker-compose.yml
 ├── README.md
 └── .gitignore
 ```
 
-## 🚀 Installation
+---
 
-### Prérequis
+# 🚀 Installation
 
-- Node.js (v18 ou supérieur)
-- Python (v3.8 ou supérieur)
-- pip
-- Nginx (pour le déploiement en production)
+### 1. Cloner le projet
 
-### Installation Backend
+```bash
+git clone https://github.com/HisseinMhtDrya/Protection-hamson.git
+cd Protection-hamson
+```
+
+### 2. Installer le Backend
 
 ```bash
 cd backend
 npm install
+npm start
 ```
 
-### Installation AI Service
+### 3. Installer le service IA
 
 ```bash
 cd ai-service
 pip install -r requirements.txt
-```
-
-### Installation pour l'évaluation (optionnel)
-
-Pour générer les rapports d'évaluation avec graphiques :
-
-```bash
-pip install matplotlib seaborn
-```
-
-## 📚 Acquisition des Datasets
-
-Pour un projet académique rigoureux, il est recommandé d'utiliser des datasets publics reconnus :
-
-### Datasets Recommandés
-
-**URLs:**
-- ISCX-URL2016 (Université du Nouveau-Brunswick)
-- Phishing Websites Dataset (UCI Machine Learning Repository)
-- Kaggle Phishing URL Datasets
-
-**Messages:**
-- SMS Spam Collection Dataset (UCI Repository)
-- CEAS 2008 / Enron Phishing Corpus
-- Kaggle Spam/Phishing Datasets
-
-### Guide Complet
-
-Consultez `datasets/README.md` pour les instructions détaillées de téléchargement et formatage des datasets.
-
-Les fichiers CSV locaux sont exclus de Git pour éviter de versionner des datasets volumineux. Les modèles entraînés (`models/*.pkl`) et les certificats SSL sont également exclus. Après avoir récupéré les datasets, lancez les scripts d'entraînement avant de démarrer le service IA. En production, fournissez les modèles via un stockage d'artefacts ou un volume persistant.
-
-## 🤖 Entraînement et Évaluation des Modèles
-
-### Option 1: Entraînement rapide (datasets d'exemple)
-
-```bash
-cd training
-python train_url_model.py
-python train_message_model.py
-```
-
-### Option 2: Évaluation rigoureuse (recommandé pour le jury)
-
-```bash
-cd training
-python evaluate_models.py
-```
-
-Ce script :
-- Entraîne les modèles sur les datasets réels dans `datasets/`
-- Génère des métriques complètes (Precision, Recall, F1-Score, ROC-AUC)
-- Crée des matrices de confusion et courbes ROC
-- Sauvegarde les rapports dans `reports/`
-
-**Format attendu des datasets:**
-- `urls.csv`: colonnes `url` et `label` (0=légitime, 1=phishing)
-- `messages.csv`: colonnes `text` et `label` (0=légitime, 1=phishing)
-
-Si les datasets n'existent pas, le script générera des données de test pour validation.
-
-## 🏃 Lancement du projet
-
-### 1. Démarrer le service IA
-
-```bash
-cd ai-service
 python main.py
 ```
 
-Le service sera disponible sur `http://localhost:8000`
+L'application peut ensuite être utilisée depuis l'interface web.
 
-### 2. Démarrer le backend
+---
 
-```bash
-cd backend
-npm start
+# 🔬 Évaluation
+
+Le projet comprend également une partie d'évaluation des modèles de Machine Learning.
+
+Les résultats peuvent être présentés à travers :
+
+* Accuracy
+* Precision
+* Recall
+* F1-Score
+* ROC-AUC
+* Matrice de confusion
+* Courbe ROC
+
+Les résultats graphiques sont disponibles dans le dossier :
+
+```text
+reports/
 ```
 
-Le backend sera disponible sur `http://localhost:3000`
+---
 
-### 3. Accéder à l'application
+# 🔐 Sécurité du projet
 
-Ouvrez votre navigateur sur `http://localhost:3000`
+La sécurité constitue une partie importante de **Protection Hamson**.
 
-## 🔐 Sécurité
+Le système met notamment en œuvre :
 
-Le projet implémente plusieurs mesures de sécurité :
+**Helmet** → protection des en-têtes HTTP
+**Zod** → validation des données
+**Rate Limiting** → limitation des requêtes
+**HTTPS/TLS** → sécurisation des communications
+**Logs** → traçabilité des analyses
 
-- **Helmet**: Headers HTTP sécurisés
-- **Rate Limiting**: Protection contre les abus
-- **Validation Zod**: Validation des entrées utilisateur
-- **Limitation de taille**: Protection contre les payloads volumineux
-- **HTTPS**: Configuration Nginx pour TLS 1.3
-- **Logs**: Journalisation des analyses
+---
 
-## 📊 Modèles IA
+# 📌 Contexte académique
 
-### Modèle URL
-- **Algorithme**: Random Forest
-- **Features**: Longueur URL, sous-domaines, caractères spéciaux, mots suspects, etc.
-- **Performance**: ~83% accuracy (sur dataset d'exemple)
+Ce projet a été réalisé dans le cadre des travaux pratiques du **Master 1 en Réseaux Informatiques et Cybersécurité**.
 
-### Modèle Message
-- **Algorithme**: Logistic Regression avec TF-IDF
-- **Features**: Vecteurs TF-IDF des mots
-- **Performance**: ~83% accuracy (sur dataset d'exemple)
+Il met en pratique plusieurs domaines :
 
-## 🔧 Configuration HTTPS / TLS 1.3
+* Cybersécurité
+* Intelligence artificielle
+* Machine Learning
+* Développement web
+* Sécurité des API
+* Architecture microservices
 
-### Génération de certificats auto-signés (démo locale)
+---
 
-Pour démontrer TLS 1.3 lors de la soutenance :
+# 🔮 Perspectives
 
-```bash
-# Générer certificat X.509 et clé privée
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout nginx/ssl/selfsigned.key \
-  -out nginx/ssl/selfsigned.crt \
-  -subj "/C=CD/ST=Kinshasa/L=Kinshasa/O=UNIKIN/OU=MSI/CN=localhost"
-```
+Les évolutions envisagées comprennent notamment :
 
-### Vérification TLS 1.3
+* amélioration des modèles de détection ;
+* utilisation de datasets plus importants ;
+* amélioration de l'explication des résultats ;
+* analyse de pièces jointes ;
+* ajout d'un tableau de bord ;
+* intégration de sources de Threat Intelligence.
 
-Ouvrez `https://localhost` dans Chrome/Firefox, puis F12 → Onglet Sécurité :
-- **Protocol**: TLS 1.3
-- **Cipher suite**: TLS_AES_256_GCM_SHA384
-- **Connection**: Secure / Encrypted
+---
 
-### Déploiement en production
+## 👨‍💻 Auteurs
 
-1. Copiez `nginx/nginx.conf` dans `/etc/nginx/sites-available/phishing-detector`
-2. Créez un lien symbolique vers `sites-enabled`
-3. Obtenez un certificat SSL (Let's Encrypt recommandé)
-4. Mettez à jour les chemins des certificats dans `nginx.conf`
-5. Redémarrez Nginx
+**Hissein Mahamat Drya & équipe**
 
-```bash
-sudo nginx -t
-sudo systemctl restart nginx
-```
+**Université de Kinshasa — Faculté des Sciences Informatiques**
+**Master 1 — Réseaux & Cybersécurité**
 
-## 📈 Améliorations futures
+---
 
-- [ ] Ajouter de vrais datasets publics de phishing
-- [ ] Implémenter le deep learning pour les messages
-- [ ] Ajouter l'analyse de pièces jointes
-- [ ] Dashboard d'administration
-- [ ] API de batch analysis
-- [ ] Intégration avec des services de threat intelligence
-
-## 👥 Équipe
-
-Ce projet est conçu pour être développé par une équipe de 4 étudiants :
-
-- **Étudiant 1**: IA URLs (Dataset, Feature Engineering, Random Forest)
-- **Étudiant 2**: IA Messages (Dataset, TF-IDF, Logistic Regression)
-- **Étudiant 3**: Backend + Sécurité (Express, Zod, Helmet, Rate Limiting)
-- **Étudiant 4**: Frontend + Déploiement (Interface, Dashboard, HTTPS/Nginx)
-
-## 📝 Licence
-
-Projet académique - Université
-
-## 🤝 Contribution
-
-Ce projet est un projet universitaire. Pour toute question, contactez l'équipe enseignante.
+<p align="center">
+  🛡️ <strong>Protection Hamson</strong><br>
+  <em>Détecter • Analyser • Protéger</em>
+</p>
