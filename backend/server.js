@@ -4,6 +4,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const path = require('path');
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const axios = require('axios');
 
@@ -13,6 +14,8 @@ const messageRoutes = require('./routes/messageRoutes');
 
 const dbPath = path.join(__dirname, 'data', 'phishing.db');
 const db = new sqlite3.Database(dbPath);
+const frontendPath = path.join(__dirname, '../frontend');
+const frontendIndexPath = path.join(frontendPath, 'index.html');
 
 function initDatabase() {
     return new Promise((resolve, reject) => {
@@ -119,7 +122,9 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Serve static files from frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
+if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+}
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -190,7 +195,14 @@ app.get('/api/health', async (req, res) => {
 
 // Serve frontend for all other routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    if (fs.existsSync(frontendIndexPath)) {
+        return res.sendFile(frontendIndexPath);
+    }
+
+    res.status(404).json({
+        error: 'Route introuvable',
+        message: 'Le frontend est déployé séparément. Utilisez une route API.'
+    });
 });
 
 // Error handling middleware
