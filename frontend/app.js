@@ -1,5 +1,8 @@
-// Use relative API path so frontend works behind reverse proxy (nginx)
-const API_URL = '/api';
+const isLocalApp = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_URL = isLocalApp
+    ? '/api'
+    : 'https://protection-hamson-backend.onrender.com/api';
+const HEALTH_URL = isLocalApp ? '/health' : `${API_URL}/health`;
 let currentType = 'url';
 let analysisHistory = [];
 
@@ -103,7 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(payload)
                 });
 
-                const data = await response.json();
+                const responseBody = await response.text();
+                let data;
+                try {
+                    data = responseBody ? JSON.parse(responseBody) : {};
+                } catch (parseError) {
+                    throw new Error(`Réponse invalide du serveur (${response.status})`);
+                }
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || `Serveur indisponible (${response.status})`);
+                }
                 displayResult(data);
                 addToHistory(currentType === 'url' ? 'URL' : 'Message', inputValue.substring(0, 50) + '...', data);
             } catch (error) {
@@ -301,7 +313,7 @@ async function refreshAdminClusterStatus() {
 
     try {
         const [nginxResponse, backendResponse] = await Promise.all([
-            fetch('/health', { cache: 'no-store' }),
+            fetch(HEALTH_URL, { cache: 'no-store' }),
             fetch(`${API_URL}/health`, { cache: 'no-store' })
         ]);
         const nginxHealth = nginxResponse.ok && (nginxResponse.headers.get('content-type') || '').includes('application/json')

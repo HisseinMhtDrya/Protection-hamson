@@ -104,8 +104,19 @@ const logger = winston.createLogger({
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:8000')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:8000',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        callback(new Error('Origine non autorisée par la configuration CORS'));
+    },
     credentials: true
 }));
 
