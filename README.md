@@ -31,18 +31,18 @@ L'objectif principal est de fournir un outil simple permettant à l'utilisateur 
 | N° | Étudiant                 | Responsabilité                            |
 | -- | ------------------------ | ----------------------------------------- |
 | 01 | **Hissein Mahamat Drya** | Backend, sécurité & intégration           |
-| 02 | **Étudiant 2**           | Détection des URLs & Machine Learning     |
-| 03 | **Étudiant 3**           | Détection des messages & Machine Learning |
-| 04 | **Étudiant 4**           | Frontend & déploiement                    |
+| 02 | **KIPULU MBONGO ADOLPHE**           | Détection des URLs & Machine Learning     |
+| 03 | **BASENGALOLEKASAMUELLA**           | Détection des messages & Machine Learning |
+| 04 | **MAZINA MASINDA JEREMIE**           | Frontend & déploiement                    |
 
-> **Superviseur :** [Nom du superviseur]
+> **Superviseur :** [Prof. Kasengedia Motumbe Pierre]
 > **Faculté :** Faculté des Sciences Informatiques
 > **Spécialité :** Réseaux & Cybersécurité
 > **Niveau :** Master 1
 
 ---
 
-# 🖥️ Aperçu de l'application
+#  Aperçu de l'application
 
 ### Page d'accueil
 
@@ -73,51 +73,20 @@ L'objectif principal est de fournir un outil simple permettant à l'utilisateur 
 ---
 
 # 🏗️ Architecture du système
+<img width="1560" height="828" alt="Capture d&#39;écran 2026-09-18 101348" src="https://github.com/user-attachments/assets/7af054e3-c3a5-4d07-bf42-78d7e57b580c" />
 
-```text
-                         👤 UTILISATEUR
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │   FRONTEND WEB   │
-                    │   HTML / CSS / JS│
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │  BACKEND API     │
-                    │ Node.js / Express│
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │    SERVICE IA    │
-                    │ Python / FastAPI │
-                    └────────┬─────────┘
-                             │
-                    ┌────────┴─────────┐
-                    ▼                  ▼
-             ┌─────────────┐    ┌──────────────┐
-             │ Modèle URL  │    │ Modèle Texte │
-             │Random Forest│    │ TF-IDF + LR  │
-             └──────┬──────┘    └──────┬───────┘
-                    │                  │
-                    └────────┬─────────┘
-                             ▼
-                    📊 SCORE + EXPLICATION
-```
-
----
 
 # ⚙️ Fonctionnalités principales
 
 ### 🔗 Détection des URLs
 
 L'utilisateur peut soumettre une URL afin d'obtenir une analyse permettant d'identifier les caractéristiques associées au phishing.
+<img width="3000" height="1711" alt="Capture d&#39;écran 2026-09-17 135914" src="https://github.com/user-attachments/assets/442bc022-3137-4e05-8fa9-b73bee973fda" />
 
 ### 💬 Détection des messages
 
 Le système analyse le contenu textuel d'un message afin d'identifier les caractéristiques pouvant indiquer une tentative d'hameçonnage.
+<img width="3000" height="1705" alt="Capture d&#39;écran 2026-09-18 093252" src="https://github.com/user-attachments/assets/f6970ba9-8fa8-45f1-b248-84839c6ddc34" />
 
 ### 📊 Résultat
 
@@ -171,29 +140,7 @@ L'API intègre plusieurs mécanismes de protection :
 
 ---
 
-# 📁 Organisation du projet
-
-```text
-Protection-hamson/
-│
-├── frontend/          → Interface utilisateur
-├── backend/           → API et sécurité
-├── ai-service/        → Service d'intelligence artificielle
-├── training/          → Entraînement des modèles
-├── datasets/          → Jeux de données
-├── models/            → Modèles entraînés
-├── reports/           → Résultats et évaluations
-├── docs/              → Documentation et captures
-├── nginx/             → Configuration serveur
-│
-├── docker-compose.yml
-├── README.md
-└── .gitignore
-```
-
----
-
-# 🚀 Installation
+#  Installation
 
 ### 1. Cloner le projet
 
@@ -222,11 +169,12 @@ L'application peut ensuite être utilisée depuis l'interface web.
 
 ---
 
-# 🔬 Évaluation
+#  Évaluation
 
 Le projet comprend également une partie d'évaluation des modèles de Machine Learning.
 
 Les résultats peuvent être présentés à travers :
+<img width="3000" height="1880" alt="Capture d&#39;écran 2026-09-17 115418" src="https://github.com/user-attachments/assets/a5ca17f6-8c61-4870-a5c9-05fd3848fe1b" />
 
 * Accuracy
 * Precision
@@ -236,17 +184,13 @@ Les résultats peuvent être présentés à travers :
 * Matrice de confusion
 * Courbe ROC
 
-Les résultats graphiques sont disponibles dans le dossier :
 
-```text
-reports/
-```
 
 ---
 
 # 🔐 Sécurité du projet
 
-La sécurité constitue une partie importante de **Protection Hamson**.
+La sécurité constitue une partie importante de **Protection Hamconnage**.
 
 Le système met notamment en œuvre :
 
@@ -258,7 +202,7 @@ Le système met notamment en œuvre :
 
 ---
 
-# 📌 Contexte académique
+#  Contexte académique
 
 Ce projet a été réalisé dans le cadre des travaux pratiques du **Master 1 en Réseaux Informatiques et Cybersécurité**.
 
@@ -273,7 +217,7 @@ Il met en pratique plusieurs domaines :
 
 ---
 
-# 🔮 Perspectives
+#  Perspectives
 
 Les évolutions envisagées comprennent notamment :
 
@@ -286,7 +230,7 @@ Les évolutions envisagées comprennent notamment :
 
 ---
 
-## 👨‍💻 Auteurs
+##  Auteurs
 
 **Hissein Mahamat Drya & équipe**
 
