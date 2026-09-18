@@ -1,4 +1,4 @@
-# 🛡️ PROTECTION HAMSON
+#  PROTECTION HAMSON
 
 ## Détecteur Web d’Hameçonnage Assisté par Intelligence Artificielle
 
@@ -9,13 +9,13 @@
 
 ---
 
-## 👨‍🎓 Présentation du travail
+##  Présentation du travail
 
 **Protection Hamson** est un système web intelligent conçu pour détecter les tentatives d’**hameçonnage (phishing)** à partir d'URLs et de messages.
 
 L'application combine une **interface web**, une **API sécurisée** et un **service d'intelligence artificielle** afin d'analyser les contenus soumis par l'utilisateur et de retourner un résultat accompagné d'un **score de risque et d'une explication**.
 
-### 🎯 Objectif
+###  Objectif
 
 L'objectif principal est de fournir un outil simple permettant à l'utilisateur de :
 
@@ -46,47 +46,35 @@ L'objectif principal est de fournir un outil simple permettant à l'utilisateur 
 
 ### Page d'accueil
 
-<p align="center">
-  <img src="docs/images/home.png" width="850">
-</p>
+<img width="3000" height="1880" alt="Capture d&#39;écran 2026-09-17 115457" src="https://github.com/user-attachments/assets/2ba7ed7e-9e78-4454-ae0e-ffce4d4a18f3" />
 
 ### Analyse d'une URL
 
-<p align="center">
-  <img src="docs/images/url-analysis.png" width="850">
-</p>
+<img width="3000" height="1711" alt="Capture d&#39;écran 2026-09-17 135914" src="https://github.com/user-attachments/assets/442bc022-3137-4e05-8fa9-b73bee973fda" />
 
 ### Analyse d'un message
 
-<p align="center">
-  <img src="docs/images/message-analysis.png" width="850">
-</p>
-
+<img width="3000" height="1705" alt="Capture d&#39;écran 2026-09-18 093252" src="https://github.com/user-attachments/assets/f6970ba9-8fa8-45f1-b248-84839c6ddc34" />
 ### Résultat de l'analyse
-
-<p align="center">
-  <img src="docs/images/result.png" width="850">
-</p>
-
+<img width="3000" height="1880" alt="Capture d&#39;écran 2026-09-17 115418" src="https://github.com/user-attachments/assets/a5ca17f6-8c61-4870-a5c9-05fd3848fe1b" />
 > Les captures d'écran présentent les principales fonctionnalités de **Protection Hamson**.
 
 ---
 
-# 🏗️ Architecture du système
+#  Architecture du système
 <img width="1560" height="828" alt="Capture d&#39;écran 2026-09-18 101348" src="https://github.com/user-attachments/assets/7af054e3-c3a5-4d07-bf42-78d7e57b580c" />
 
 
 # ⚙️ Fonctionnalités principales
 
-### 🔗 Détection des URLs
+###  Détection des URLs
 
 L'utilisateur peut soumettre une URL afin d'obtenir une analyse permettant d'identifier les caractéristiques associées au phishing.
-<img width="3000" height="1711" alt="Capture d&#39;écran 2026-09-17 135914" src="https://github.com/user-attachments/assets/442bc022-3137-4e05-8fa9-b73bee973fda" />
 
-### 💬 Détection des messages
+###  Détection des messages
 
 Le système analyse le contenu textuel d'un message afin d'identifier les caractéristiques pouvant indiquer une tentative d'hameçonnage.
-<img width="3000" height="1705" alt="Capture d&#39;écran 2026-09-18 093252" src="https://github.com/user-attachments/assets/f6970ba9-8fa8-45f1-b248-84839c6ddc34" />
+
 
 ### 📊 Résultat
 
@@ -97,7 +85,7 @@ Après l'analyse, l'application présente notamment :
 * un score ;
 * une explication du résultat.
 
-### 🛡️ Sécurité
+###  Sécurité
 
 L'API intègre plusieurs mécanismes de protection :
 
@@ -109,7 +97,7 @@ L'API intègre plusieurs mécanismes de protection :
 
 ---
 
-# 🧠 Modèles utilisés
+#  Modèles utilisés
 
 | Élément analysé | Technologie                  |
 | --------------- | ---------------------------- |
@@ -120,7 +108,7 @@ L'API intègre plusieurs mécanismes de protection :
 
 ---
 
-# 🛠️ Technologies
+#  Technologies
 
 **Frontend**
 
@@ -174,7 +162,7 @@ L'application peut ensuite être utilisée depuis l'interface web.
 Le projet comprend également une partie d'évaluation des modèles de Machine Learning.
 
 Les résultats peuvent être présentés à travers :
-<img width="3000" height="1880" alt="Capture d&#39;écran 2026-09-17 115418" src="https://github.com/user-attachments/assets/a5ca17f6-8c61-4870-a5c9-05fd3848fe1b" />
+
 
 * Accuracy
 * Precision
@@ -188,7 +176,7 @@ Les résultats peuvent être présentés à travers :
 
 ---
 
-# 🔐 Sécurité du projet
+#  Sécurité du projet
 
 La sécurité constitue une partie importante de **Protection Hamconnage**.
 
