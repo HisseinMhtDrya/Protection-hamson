@@ -76,7 +76,7 @@ L'utilisateur peut soumettre une URL afin d'obtenir une analyse permettant d'ide
 Le système analyse le contenu textuel d'un message afin d'identifier les caractéristiques pouvant indiquer une tentative d'hameçonnage.
 
 
-### 📊 Résultat
+###  Résultat
 
 Après l'analyse, l'application présente notamment :
 
@@ -216,18 +216,8 @@ Les évolutions envisagées comprennent notamment :
 * ajout d'un tableau de bord ;
 * intégration de sources de Threat Intelligence.
 
----
-
-##  Auteurs
-
-**Hissein Mahamat Drya & équipe**
-
-**Université de Kinshasa — Faculté des Sciences Informatiques**
-**Master 1 — Réseaux & Cybersécurité**
-
----
 
 <p align="center">
-  🛡️ <strong>Protection Hamson</strong><br>
+   <strong>Protection Hamson</strong><br>
   <em>Détecter • Analyser • Protéger</em>
 </p>
