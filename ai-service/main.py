@@ -35,7 +35,19 @@ class MessageRequest(BaseModel):
 class AnalysisResponse(BaseModel):
     is_phishing: bool
     score: float
+    risk_level: str
+    indicator_color: str
+    recommended_action: str
     explanations: List[str]
+
+def classify_risk(score: float) -> tuple[str, str, str]:
+    if score <= 30:
+        return "FAIBLE", "#10b981", "Contenu probablement sûr."
+    if score <= 60:
+        return "MODÉRÉ", "#f59e0b", "Prudence recommandée. Vérifiez l'expéditeur."
+    if score <= 80:
+        return "ÉLEVÉ", "#f97316", "Ne cliquez pas sur les liens et vérifiez la source."
+    return "CRITIQUE", "#e63956", "Tentative d'hameçonnage probable. Supprimez ce contenu."
 
 def extract_url_features(url: str) -> dict:
     """Extract features from URL for analysis"""
@@ -206,10 +218,14 @@ async def predict_url(request: URLRequest):
             is_phishing = score >= 50
 
         explanations = generate_url_explanations(features, score)
+        risk_level, indicator_color, recommended_action = classify_risk(score)
 
         return AnalysisResponse(
             is_phishing=is_phishing,
             score=score,
+            risk_level=risk_level,
+            indicator_color=indicator_color,
+            recommended_action=recommended_action,
             explanations=explanations
         )
 
@@ -233,7 +249,10 @@ async def predict_message(request: MessageRequest):
             'password': 25, 'login': 20, 'verify': 20, 'urgent': 25,
             'account': 15, 'bank': 20, 'paypal': 25, 'secure': 15,
             'immediate': 20, 'suspended': 25, 'blocked': 25,
-            'click': 15, 'update': 15, 'confirm': 20, 'banking': 25
+            'click': 15, 'update': 15, 'confirm': 20, 'banking': 25,
+            'compte': 15, 'banque': 20, 'bancaire': 20, 'suspendu': 25,
+            'cliquez': 15, 'vérifier': 20, 'confirmer': 20,
+            'immédiatement': 20, 'livraison': 15, 'frais': 10
         }
         
         for keyword, weight in suspicious_keywords.items():
@@ -284,10 +303,15 @@ async def predict_message(request: MessageRequest):
                 explanations.append("Message très court - analyse limitée")
             else:
                 explanations.append("Aucun motif de phishing évident détecté")
+
+        risk_level, indicator_color, recommended_action = classify_risk(score)
         
         return AnalysisResponse(
             is_phishing=is_phishing,
             score=score,
+            risk_level=risk_level,
+            indicator_color=indicator_color,
+            recommended_action=recommended_action,
             explanations=explanations
         )
         

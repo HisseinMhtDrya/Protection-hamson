@@ -4,7 +4,7 @@ const API_URL = isLocalApp
     : 'https://protection-hamson-backend.onrender.com/api';
 const HEALTH_URL = isLocalApp ? '/health' : `${API_URL}/health`;
 let currentType = 'url';
-let analysisHistory = [];
+let analysisHistory = loadSavedHistory();
 
 const headersMap = {
     'tab-dashboard': {
@@ -71,8 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     : 'Collez votre message suspect ici...';
                 input.value = '';
             }
+            updateDemoVisibility();
         });
     });
+
+    document.querySelectorAll('[data-demo]').forEach(button => {
+        button.addEventListener('click', () => loadDemo(button.dataset.demo));
+    });
+
+    updateDemoVisibility();
 
     const quickScanBtn = document.getElementById('btn-quick-scan');
     if (quickScanBtn) {
@@ -144,6 +151,13 @@ function triggerTabDataLoader(tabId) {
         default:
             break;
     }
+}
+
+function updateDemoVisibility() {
+    const urlDemos = document.getElementById('url-demo-buttons');
+    const messageReferences = document.getElementById('message-references');
+    if (urlDemos) urlDemos.hidden = currentType !== 'url';
+    if (messageReferences) messageReferences.hidden = currentType !== 'message';
 }
 
 async function loadMonitoredDomains() {
@@ -221,27 +235,51 @@ async function loadMonitoredDomains() {
 function loadThreatHistory() {
     const container = document.getElementById('tab-threats');
     if (!container) return;
+
+    const historyItems = analysisHistory.length
+        ? analysisHistory.map(item => `
+            <li class="threat-history-item ${item.is_phishing ? 'threat-detected' : 'threat-safe'}">
+                <div class="threat-history-main">
+                    <strong>${item.is_phishing ? '🚨' : '✅'} ${escapeHtml(item.type)} - Score ${escapeHtml(String(item.score))}%</strong>
+                    <span>${escapeHtml(item.input)}</span>
+                </div>
+                <div class="threat-history-meta">
+                    <strong>${escapeHtml(item.riskLevel || 'NON CLASSÉ')}</strong>
+                    <small>${escapeHtml(item.timestamp)}</small>
+                </div>
+            </li>
+        `).join('')
+        : '<li class="placeholder-text">Aucune analyse effectuée pour le moment.</li>';
+
     container.innerHTML = `
         <div class="card">
             <div class="card-header">
                 <h2>Journal des Attaques Interceptées</h2>
-                <span class="status-badge status-phishing">Base XAI Enrichie</span>
+                <div>
+                    <span class="status-badge status-phishing">Base XAI Enrichie</span>
+                    ${analysisHistory.length ? '<button type="button" class="btn-demo" id="clear-threat-history">Effacer</button>' : ''}
+                </div>
             </div>
             <div class="card-body">
-                <ul class="explanations-list">
-                    <li style="border-left-color: var(--accent-red);"><strong>🚨 Score 94%</strong> — http://paypal-verification-security.xyz/login.php</li>
-                    <li style="border-left-color: var(--accent-red);"><strong>🚨 Score 88%</strong> — SMS: Urgent Banque - Votre compte est bloqué.</li>
-                    <li style="border-left-color: #f59e0b;"><strong>⚠️ Score 65%</strong> — http://login-unikin-cd.com</li>
-                    <li style="border-left-color: var(--accent-green);"><strong>✅ Score 12%</strong> — https://www.unikin.ac.cd</li>
-                </ul>
+                <ul class="explanations-list threat-history-list">${historyItems}</ul>
             </div>
         </div>
     `;
+
+    const clearButton = document.getElementById('clear-threat-history');
+    if (clearButton) {
+        clearButton.addEventListener('click', () => {
+            analysisHistory = [];
+            localStorage.removeItem('analysisHistory');
+            loadThreatHistory();
+        });
+    }
 }
 
 function loadSettingsForm() {
     const container = document.getElementById('tab-settings');
     if (!container) return;
+    const savedThreshold = Number(localStorage.getItem('phishingAlertThreshold')) || 75;
     container.innerHTML = `
         <div class="card">
             <div class="card-header">
@@ -251,7 +289,8 @@ function loadSettingsForm() {
                 <form id="settings-form">
                     <div style="margin-bottom: 20px;">
                         <label style="display:block; margin-bottom:8px; color:var(--text-secondary);">Seuil d'alerte Phishing :</label>
-                        <input type="range" min="50" max="95" value="75" style="width:100%; accent-color: var(--accent-red);">
+                        <input type="range" id="alert-threshold" min="50" max="95" value="${savedThreshold}" style="width:100%; accent-color: var(--accent-red);">
+                        <output id="alert-threshold-value" for="alert-threshold" style="display:block; margin-top:8px; color:var(--text-primary); font-weight:600;">${savedThreshold}%</output>
                     </div>
                     <button type="submit" class="btn-primary">Enregistrer la configuration</button>
                     <p id="settings-status" style="margin-top: 12px; color: var(--accent-green); display:none;">Paramètres enregistrés.</p>
@@ -261,9 +300,20 @@ function loadSettingsForm() {
     `;
 
     const settingsForm = document.getElementById('settings-form');
+    const thresholdInput = document.getElementById('alert-threshold');
+    const thresholdValue = document.getElementById('alert-threshold-value');
+    if (thresholdInput && thresholdValue) {
+        thresholdInput.addEventListener('input', () => {
+            thresholdValue.textContent = `${thresholdInput.value}%`;
+        });
+    }
+
     if (settingsForm) {
         settingsForm.addEventListener('submit', (event) => {
             event.preventDefault();
+            if (thresholdInput) {
+                localStorage.setItem('phishingAlertThreshold', thresholdInput.value);
+            }
             const status = document.getElementById('settings-status');
             if (status) {
                 status.style.display = 'block';
@@ -382,8 +432,11 @@ function displayResult(data) {
 
     if (!statusBadge || !scoreDisplay || !riskLevelDisplay || !classificationDisplay || !explanationsList) return;
 
+    const alertThreshold = Number(localStorage.getItem('phishingAlertThreshold')) || 75;
+    const alertTriggered = Number(data.score) >= alertThreshold;
+
     scoreDisplay.textContent = `${data.score}%`;
-    classificationDisplay.textContent = data.is_phishing ? 'PHISHING' : 'LÉGITIME';
+    classificationDisplay.textContent = alertTriggered ? 'PHISHING' : 'LÉGITIME';
 
     if (data.risk_level) {
         riskLevelDisplay.textContent = data.risk_level;
@@ -396,7 +449,7 @@ function displayResult(data) {
         recommendedAction.style.color = data.indicator_color || 'var(--text-secondary)';
     }
 
-    if (data.is_phishing) {
+    if (alertTriggered) {
         statusBadge.textContent = 'Menace détectée';
         statusBadge.className = 'status-badge status-phishing';
         classificationDisplay.style.color = data.indicator_color || 'var(--accent-red)';
@@ -414,8 +467,39 @@ function displayResult(data) {
 }
 
 function addToHistory(type, input, data) {
-    analysisHistory.unshift({ type, input, is_phishing: data.is_phishing, score: data.score, timestamp: new Date().toLocaleString('fr-FR') });
+    const alertThreshold = Number(localStorage.getItem('phishingAlertThreshold')) || 75;
+    analysisHistory.unshift({
+        type,
+        input,
+        is_phishing: Number(data.score) >= alertThreshold,
+        score: data.score,
+        riskLevel: data.risk_level,
+        timestamp: new Date().toLocaleString('fr-FR')
+    });
     if (analysisHistory.length > 10) analysisHistory.pop();
+    localStorage.setItem('analysisHistory', JSON.stringify(analysisHistory));
+    if (document.getElementById('tab-threats')?.classList.contains('active-view')) {
+        loadThreatHistory();
+    }
+}
+
+function loadSavedHistory() {
+    try {
+        const savedHistory = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+        return Array.isArray(savedHistory) ? savedHistory : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function escapeHtml(value) {
+    return value.replace(/[&<>'"]/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[character]));
 }
 
 function loadDemo(type) {
@@ -428,19 +512,39 @@ function loadDemo(type) {
         document.querySelector('[data-type="url"]').classList.add('active');
         currentType = 'url';
         input.placeholder = 'https://exemple-suspect.xyz/login';
+        updateDemoVisibility();
     } else if (type === 'legit_url') {
         input.value = 'https://www.google.com';
         document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-type="url"]').classList.add('active');
         currentType = 'url';
         input.placeholder = 'https://exemple-suspect.xyz/login';
+        updateDemoVisibility();
+    } else if (type === 'phishing_msg_urgent') {
+        input.value = 'URGENT : Votre compte bancaire sera suspendu aujourd’hui. Confirmez vos informations immédiatement sur http://bit.ly/bank-sec';
+        selectMessageType(input);
+    } else if (type === 'phishing_msg_delivery') {
+        input.value = 'Votre colis ne peut pas être livré. Réglez 2,99 EUR de frais de livraison ici : http://delivery-check.example';
+        selectMessageType(input);
+    } else if (type === 'phishing_msg_prize') {
+        input.value = 'Félicitations ! Vous avez gagné 500 000 FCFA. Envoyez vos coordonnées bancaires pour recevoir votre prix.';
+        selectMessageType(input);
+    } else if (type === 'legit_msg') {
+        input.value = 'Votre rendez-vous de consultation est confirmé pour demain à 10h00. Merci de vous présenter 15 minutes à l’avance.';
+        selectMessageType(input);
     } else if (type === 'phishing_msg') {
-        input.value = 'URGENT: Votre compte a été suspendu. Mettez à jour vos informations sur http://bit.ly/bank-sec';
+        input.value = 'URGENT : Votre compte a été suspendu. Mettez à jour vos informations sur http://bit.ly/bank-sec';
+        selectMessageType(input);
+    }
+
+    input.focus();
+
+}
+
+function selectMessageType(input) {
         document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-type="message"]').classList.add('active');
         currentType = 'message';
         input.placeholder = 'Collez votre message suspect ici...';
-    }
-
-    input.focus();
+        updateDemoVisibility();
 }

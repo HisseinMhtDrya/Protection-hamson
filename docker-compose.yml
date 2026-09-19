@@ -22,8 +22,6 @@ services:
       - NODE_ENV=production
       - FRONTEND_URL=${FRONTEND_URL:-https://localhost}
       - AI_SERVICE_URL=http://ai-service:8000
-    ports:
-      - "3000:3000"
     depends_on:
       - ai-service
     volumes:

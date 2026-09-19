@@ -82,15 +82,31 @@
                             <!-- Section Simulation Pédagogique -->
                             <div class="simulation-section">
                                 <span class="simulation-label">Exemples de démonstration :</span>
-                                <div class="demo-buttons">
-                                    <button type="button" class="btn-demo" onclick="loadDemo('phishing_url')">
+                                <div class="demo-buttons" id="url-demo-buttons">
+                                    <button type="button" class="btn-demo" data-demo="phishing_url">
                                         <i class="fa-solid fa-triangle-exclamation"></i> URL Phishing (PayPal)
                                     </button>
-                                    <button type="button" class="btn-demo" onclick="loadDemo('legit_url')">
+                                    <button type="button" class="btn-demo" data-demo="legit_url">
                                         <i class="fa-solid fa-check-circle"></i> URL Légitime (Google)
                                     </button>
-                                    <button type="button" class="btn-demo" onclick="loadDemo('phishing_msg')">
-                                        <i class="fa-solid fa-envelope"></i> SMS Urgent Banque
+                                </div>
+                                <div class="message-references" id="message-references">
+                                    <span class="reference-label">Références de messages :</span>
+                                    <button type="button" class="message-reference" data-demo="phishing_msg_urgent">
+                                        <span><i class="fa-solid fa-triangle-exclamation"></i> Banque, compte suspendu</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                    <button type="button" class="message-reference" data-demo="phishing_msg_delivery">
+                                        <span><i class="fa-solid fa-box"></i> Livraison, frais impayés</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                    <button type="button" class="message-reference" data-demo="phishing_msg_prize">
+                                        <span><i class="fa-solid fa-gift"></i> Gain exceptionnel</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                    <button type="button" class="message-reference" data-demo="legit_msg">
+                                        <span><i class="fa-solid fa-circle-check"></i> Message informatif légitime</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
                                     </button>
                                 </div>
                             </div>
@@ -141,6 +157,6 @@
             <section class="tab-view" id="tab-admin"></section>
         </main>
     </div>
-    <script src="app.js?v=health-live-2"></script>
+    <script src="app.js?v=health-live-7"></script>
 </body>
 </html>
