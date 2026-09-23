@@ -101,7 +101,7 @@ L'API intègre plusieurs mécanismes de protection :
 
 | Élément analysé | Technologie                  |
 | --------------- | ---------------------------- |
-| URLs            | Random Forest                |
+| URLs            | Random Forest, XGBoost, SVM, Régression logistique |
 | Messages        | TF-IDF + Logistic Regression |
 | API IA          | Python / FastAPI             |
 | API principale  | Node.js / Express            |
@@ -120,7 +120,7 @@ L'API intègre plusieurs mécanismes de protection :
 
 **Intelligence artificielle**
 
-`Python` · `FastAPI` · `Scikit-learn`
+`Python` · `FastAPI` · `Scikit-learn` · `XGBoost`
 
 **Infrastructure**
 

@@ -103,7 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const endpoint = currentType === 'url' ? '/analyze/url' : '/analyze/message';
-                const payload = currentType === 'url' ? { url: inputValue } : { message: inputValue };
+                const payload = currentType === 'url'
+                    ? { url: inputValue, model_name: document.getElementById('url-model')?.value || 'xgboost' }
+                    : { message: inputValue };
 
                 const response = await fetch(`${API_URL}${endpoint}`, {
                     method: 'POST',

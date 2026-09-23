@@ -5,4 +5,5 @@ scikit-learn
 pandas
 numpy
 joblib
+xgboost
 python-multipart==0.0.6

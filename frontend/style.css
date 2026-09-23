@@ -3,6 +3,7 @@
     --bg-card: #181920;
     --bg-sidebar: #15161d;
     --bg-input: #1f212a;
+    --surface-color: #1f212a;
     --border-color: #272935;
     
     --text-primary: #ffffff;
@@ -220,6 +221,35 @@ body {
     font-size: 14px;
     margin-bottom: 16px;
     outline: none;
+}
+
+.model-selection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.model-selection label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.model-selection select {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--surface-color);
+    color: var(--text-primary);
+    color-scheme: dark;
+    cursor: pointer;
+}
+
+.model-selection select option {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
 }
 
 .input-group input:focus {

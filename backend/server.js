@@ -109,6 +109,10 @@ const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:8000')
     .map(origin => origin.trim())
     .filter(Boolean);
 
+if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:3000', 'http://127.0.0.1:3000');
+}
+
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {

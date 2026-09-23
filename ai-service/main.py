@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Literal
 import joblib
 import os
 from urllib.parse import urlparse
@@ -12,6 +12,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Model paths
 URL_MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "url_model.pkl")
+URL_MODEL_PATHS = {
+    "random_forest": os.path.join(BASE_DIR, "..", "models", "random_forest_model.pkl"),
+    "xgboost": os.path.join(BASE_DIR, "..", "models", "xgboost_model.pkl"),
+    "svm": os.path.join(BASE_DIR, "..", "models", "svm_model.pkl"),
+    "logistic_regression": os.path.join(BASE_DIR, "..", "models", "logistic_regression_model.pkl"),
+}
 MESSAGE_MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "message_model.pkl")
 MESSAGE_VECTORIZER_PATH = os.path.join(BASE_DIR, "..", "models", "message_vectorizer.pkl")
 
@@ -24,10 +30,14 @@ URL_FEATURE_COLUMNS = [
 
 # Load models (will be None until trained)
 url_model = None
+url_models = {}
 message_pipeline = None  # Changed to pipeline for TF-IDF + Logistic Regression
 
 class URLRequest(BaseModel):
+    model_config = {'protected_namespaces': ()}
+
     url: str
+    model_name: Literal['random_forest', 'xgboost', 'svm', 'logistic_regression'] = 'xgboost'
 
 class MessageRequest(BaseModel):
     message: str
@@ -135,16 +145,30 @@ def generate_url_explanations(features: dict, score: float) -> List[str]:
 
 @app.on_event("startup")
 async def load_models():
-    """Load trained models on startup"""
-    global url_model, message_pipeline
-    
+    """Load trained models on startup."""
+    global url_model, url_models, message_pipeline
+
+    url_models = {}
+    for model_name, model_path in URL_MODEL_PATHS.items():
+        if os.path.exists(model_path):
+            try:
+                url_models[model_name] = joblib.load(model_path)
+                print(f"✅ {model_name} URL model loaded successfully")
+            except Exception as e:
+                print(f"❌ Error loading {model_name} URL model: {e}")
+
+    # Compatibility with installations that only have the original model.
     if os.path.exists(URL_MODEL_PATH):
         try:
             url_model = joblib.load(URL_MODEL_PATH)
-            print("✅ URL model loaded successfully")
+            url_models.setdefault("random_forest", url_model)
+            print("✅ Legacy URL model loaded successfully")
         except Exception as e:
-            print(f"❌ Error loading URL model: {e}")
+            print(f"❌ Error loading legacy URL model: {e}")
     else:
+        url_model = None
+
+    if not url_models:
         print("⚠️ URL model not found - using fallback analysis")
     
     if os.path.exists(MESSAGE_MODEL_PATH):
@@ -164,14 +188,15 @@ async def root():
 async def health():
     return {
         "status": "healthy",
-        "url_model_loaded": url_model is not None,
+        "url_model_loaded": bool(url_models),
+        "url_models_loaded": sorted(url_models.keys()),
         "message_model_loaded": message_pipeline is not None
     }
 
-def get_url_feature_vector(features: dict) -> list:
+def get_url_feature_vector(features: dict, model) -> list:
     """Build the feature vector in the same order used during training."""
-    if hasattr(url_model, 'feature_names_in_'):
-        feature_names = list(url_model.feature_names_in_)
+    if hasattr(model, 'feature_names_in_'):
+        feature_names = list(model.feature_names_in_)
         return [features.get(name, 0) for name in feature_names]
     return [features.get(name, 0) for name in URL_FEATURE_COLUMNS]
 
@@ -182,11 +207,15 @@ async def predict_url(request: URLRequest):
     try:
         features = extract_url_features(request.url)
 
-        if url_model is not None:
+        selected_model = url_models.get(request.model_name)
+        if selected_model is None:
+            selected_model = url_models.get('xgboost') or url_models.get('random_forest') or url_model
+
+        if selected_model is not None:
             try:
-                feature_vector = get_url_feature_vector(features)
-                probability = url_model.predict_proba([feature_vector])[0][1]
-                is_phishing = url_model.predict([feature_vector])[0] == 1
+                feature_vector = get_url_feature_vector(features, selected_model)
+                probability = selected_model.predict_proba([feature_vector])[0][1]
+                is_phishing = selected_model.predict([feature_vector])[0] == 1
                 score = int(probability * 100)
             except Exception as model_error:
                 print(f"⚠️ Model prediction failed, using fallback analysis: {model_error}")

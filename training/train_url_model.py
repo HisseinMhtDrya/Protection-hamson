@@ -1,8 +1,13 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from xgboost import XGBClassifier
 import joblib
 import os
 from urllib.parse import urlparse
@@ -129,7 +134,7 @@ def create_sample_dataset():
     return df
 
 def train_url_model():
-    """Train Random Forest model for URL detection"""
+    """Train and save the URL classifiers used by the AI service."""
     
     # Check if dataset exists, if not create sample
     dataset_path = '../datasets/urls.csv'
@@ -160,45 +165,51 @@ def train_url_model():
     print(f"Training set: {len(X_train)} samples")
     print(f"Test set: {len(X_test)} samples")
     
-    # Train Random Forest
-    print("🤖 Training Random Forest model...")
-    rf_model = RandomForestClassifier(
-        n_estimators=100,
-        max_depth=10,
-        random_state=42,
-        n_jobs=-1
-    )
-    
-    rf_model.fit(X_train, y_train)
-    
-    # Evaluate
-    y_pred = rf_model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    
+    models = {
+        'random_forest': RandomForestClassifier(
+            n_estimators=100,
+            max_depth=10,
+            random_state=42,
+            n_jobs=-1
+        ),
+        'xgboost': XGBClassifier(
+            n_estimators=100,
+            max_depth=4,
+            learning_rate=0.1,
+            eval_metric='logloss',
+            random_state=42,
+            n_jobs=-1
+        ),
+        'svm': make_pipeline(
+            StandardScaler(),
+            SVC(probability=True, random_state=42)
+        ),
+        'logistic_regression': make_pipeline(
+            StandardScaler(),
+            LogisticRegression(max_iter=1000, random_state=42)
+        )
+    }
+
+    os.makedirs('../models', exist_ok=True)
     print("\n📊 Model Evaluation:")
-    print(f"Accuracy: {accuracy:.4f}")
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred, target_names=['Legitimate', 'Phishing']))
-    
-    print("\nConfusion Matrix:")
-    print(confusion_matrix(y_test, y_pred))
-    
-    # Feature importance
-    feature_importance = pd.DataFrame({
-        'feature': feature_columns,
-        'importance': rf_model.feature_importances_
-    }).sort_values('importance', ascending=False)
-    
-    print("\n🔍 Feature Importance:")
-    print(feature_importance)
-    
-    # Save model
+    for model_name, model in models.items():
+        print(f"\n🤖 Training {model_name} model...")
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f"Accuracy: {accuracy:.4f}")
+        print(classification_report(y_test, y_pred, target_names=['Legitimate', 'Phishing']))
+        model_path = f'../models/{model_name}_model.pkl'
+        joblib.dump(model, model_path)
+        print(f"✅ Model saved to {model_path}")
+
+    # Keep the original filename for existing deployments and clients.
     os.makedirs('../models', exist_ok=True)
     model_path = '../models/url_model.pkl'
-    joblib.dump(rf_model, model_path)
-    print(f"\n✅ Model saved to {model_path}")
+    joblib.dump(models['random_forest'], model_path)
+    print(f"✅ Legacy model saved to {model_path}")
     
-    return rf_model
+    return models
 
 if __name__ == "__main__":
     print("🚀 Starting URL model training...")

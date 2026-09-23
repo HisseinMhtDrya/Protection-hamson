@@ -12,7 +12,8 @@ const urlSchema = z.object({
             } catch {
                 return false;
             }
-        }, 'URL invalide')
+        }, 'URL invalide'),
+    model_name: z.enum(['random_forest', 'xgboost', 'svm', 'logistic_regression']).optional()
 });
 
 // Message validation schema
