@@ -1,0 +1,6 @@
+{
+  "model_name": "random_forest",
+  "selection_metric": "phishing_f1",
+  "score": 0.8,
+  "accuracy": 0.8333333333333334
+}

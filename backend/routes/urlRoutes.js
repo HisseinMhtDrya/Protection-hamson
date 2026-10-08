@@ -10,17 +10,14 @@ const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 // Apply strict rate limiting to URL analysis
 router.post('/url', strictLimiter, validateUrl, async (req, res) => {
     try {
-        const { url, model_name } = req.body;
+        const { url } = req.body;
         
         logSecurityEvent('URL_ANALYSIS_REQUEST', { url, ip: req.ip });
         
         // Try to forward request to AI service
         let result;
         try {
-            const response = await axios.post(`${AI_SERVICE_URL}/predict/url`, {
-                url,
-                ...(model_name ? { model_name } : {})
-            }, {
+            const response = await axios.post(`${AI_SERVICE_URL}/predict/url`, { url }, {
                 timeout: 10000 // 10 second timeout
             });
             result = response.data;

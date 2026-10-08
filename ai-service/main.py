@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Literal
+from typing import List
 import joblib
 import os
+import json
 from urllib.parse import urlparse
 import re
 
@@ -12,6 +13,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Model paths
 URL_MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "url_model.pkl")
+BEST_URL_MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "best_url_model.json")
 URL_MODEL_PATHS = {
     "random_forest": os.path.join(BASE_DIR, "..", "models", "random_forest_model.pkl"),
     "xgboost": os.path.join(BASE_DIR, "..", "models", "xgboost_model.pkl"),
@@ -37,7 +39,6 @@ class URLRequest(BaseModel):
     model_config = {'protected_namespaces': ()}
 
     url: str
-    model_name: Literal['random_forest', 'xgboost', 'svm', 'logistic_regression'] = 'xgboost'
 
 class MessageRequest(BaseModel):
     message: str
@@ -149,24 +150,37 @@ async def load_models():
     global url_model, url_models, message_pipeline
 
     url_models = {}
-    for model_name, model_path in URL_MODEL_PATHS.items():
-        if os.path.exists(model_path):
-            try:
-                url_models[model_name] = joblib.load(model_path)
-                print(f"✅ {model_name} URL model loaded successfully")
-            except Exception as e:
-                print(f"❌ Error loading {model_name} URL model: {e}")
+    url_model = None
+    champion_name = None
+    if os.path.exists(BEST_URL_MODEL_PATH):
+        try:
+            with open(BEST_URL_MODEL_PATH, encoding='utf-8') as champion_file:
+                champion_name = json.load(champion_file).get('model_name')
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"❌ Error reading URL champion metadata: {e}")
 
-    # Compatibility with installations that only have the original model.
-    if os.path.exists(URL_MODEL_PATH):
+    fallback_names = ['xgboost', 'random_forest', 'svm', 'logistic_regression']
+    model_candidates = ([champion_name] if champion_name in URL_MODEL_PATHS else [])
+    model_candidates.extend(name for name in fallback_names if name not in model_candidates)
+    for model_name in model_candidates:
+        model_path = URL_MODEL_PATHS[model_name]
+        if not os.path.exists(model_path):
+            continue
+        try:
+            url_model = joblib.load(model_path)
+            url_models[model_name] = url_model
+            print(f"✅ Active URL model loaded: {model_name}")
+            break
+        except Exception as e:
+            print(f"❌ Error loading {model_name} URL model: {e}")
+
+    if url_model is None and os.path.exists(URL_MODEL_PATH):
         try:
             url_model = joblib.load(URL_MODEL_PATH)
-            url_models.setdefault("random_forest", url_model)
+            url_models['random_forest'] = url_model
             print("✅ Legacy URL model loaded successfully")
         except Exception as e:
             print(f"❌ Error loading legacy URL model: {e}")
-    else:
-        url_model = None
 
     if not url_models:
         print("⚠️ URL model not found - using fallback analysis")
@@ -207,15 +221,11 @@ async def predict_url(request: URLRequest):
     try:
         features = extract_url_features(request.url)
 
-        selected_model = url_models.get(request.model_name)
-        if selected_model is None:
-            selected_model = url_models.get('xgboost') or url_models.get('random_forest') or url_model
-
-        if selected_model is not None:
+        if url_model is not None:
             try:
-                feature_vector = get_url_feature_vector(features, selected_model)
-                probability = selected_model.predict_proba([feature_vector])[0][1]
-                is_phishing = selected_model.predict([feature_vector])[0] == 1
+                feature_vector = get_url_feature_vector(features, url_model)
+                probability = url_model.predict_proba([feature_vector])[0][1]
+                is_phishing = url_model.predict([feature_vector])[0] == 1
                 score = int(probability * 100)
             except Exception as model_error:
                 print(f"⚠️ Model prediction failed, using fallback analysis: {model_error}")

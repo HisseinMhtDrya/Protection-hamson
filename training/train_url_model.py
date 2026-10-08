@@ -6,9 +6,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score
 from xgboost import XGBClassifier
 import joblib
+import json
 import os
 from urllib.parse import urlparse
 import re
@@ -192,22 +193,40 @@ def train_url_model():
 
     os.makedirs('../models', exist_ok=True)
     print("\n📊 Model Evaluation:")
+    model_scores = {}
     for model_name, model in models.items():
         print(f"\n🤖 Training {model_name} model...")
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
+        phishing_f1 = f1_score(y_test, y_pred, pos_label=1, zero_division=0)
+        model_scores[model_name] = (phishing_f1, accuracy)
         print(f"Accuracy: {accuracy:.4f}")
+        print(f"Phishing F1: {phishing_f1:.4f}")
         print(classification_report(y_test, y_pred, target_names=['Legitimate', 'Phishing']))
         model_path = f'../models/{model_name}_model.pkl'
         joblib.dump(model, model_path)
         print(f"✅ Model saved to {model_path}")
 
+    best_model_name = max(model_scores, key=model_scores.get)
+    best_model = models[best_model_name]
+    best_f1, best_accuracy = model_scores[best_model_name]
+
     # Keep the original filename for existing deployments and clients.
-    os.makedirs('../models', exist_ok=True)
     model_path = '../models/url_model.pkl'
-    joblib.dump(models['random_forest'], model_path)
+    joblib.dump(best_model, model_path)
     print(f"✅ Legacy model saved to {model_path}")
+
+    champion_path = '../models/best_url_model.json'
+    with open(champion_path, 'w', encoding='utf-8') as champion_file:
+        json.dump({
+            'model_name': best_model_name,
+            'selection_metric': 'phishing_f1',
+            'score': best_f1,
+            'accuracy': best_accuracy
+        }, champion_file, indent=2)
+    print(f"🏆 Best URL model: {best_model_name} (phishing F1: {best_f1:.4f})")
+    print(f"✅ Champion metadata saved to {champion_path}")
     
     return models
 
